@@ -1,4 +1,4 @@
-# Ecceleratewrap
+# Eccelwrap
 
 Eccelwrap provides a wrapper around the type 2 and 3 bilinear groups based on BN-256 and BN-464 curves offered by the [Eccelerate™](https://jce.iaik.tugraz.at/products/core-crypto-toolkits/eccelerate/) library.
 It is designed to be used with the Cryptimeleon Math library to allow for use of faster bilinear groups compared to the slow ones implemented in the Cryptimeleon Math library.
