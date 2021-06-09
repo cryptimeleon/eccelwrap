@@ -1,0 +1,99 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group 'org.cryptimeleon'
+archivesBaseName = project.name
+boolean isRelease = project.hasProperty("release")
+version = '1.0.0'  + (isRelease ? "" : "-SNAPSHOT")
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+def mathVersionNoSuffix = '2.0.0'
+
+dependencies {
+    def mathVersion = mathVersionNoSuffix + (isRelease ? "" : "-SNAPSHOT")
+
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
+    api group: 'org.cryptimeleon', name: 'math', version: mathVersion
+
+    // For tests
+    testImplementation(group: 'org.cryptimeleon', name: 'math', version: mathVersion) {
+        capabilities {
+            requireCapability("org.cryptimeleon:math-tests")
+        }
+    }
+
+    implementation group: 'iaik', name: 'eccelerate', version:'6.2.0'
+    implementation group: 'iaik', name: 'jce_full', version:'5.62.0'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompileOnly(
+            'junit:junit:4.12'
+    )
+    testImplementation(
+            'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    )
+    testRuntimeOnly(
+            'org.junit.jupiter:junit-jupiter-engine:5.1.0',
+            'org.junit.vintage:junit-vintage-engine:5.1.0'
+    )
+}
+
+test {
+    useJUnitPlatform()
+    maxParallelForks 4
+    //we want display the following test events
+    testLogging {
+        events "PASSED", "STARTED", "FAILED", "SKIPPED"
+    }
+    afterSuite { desc, result ->
+        if (!desc.parent) { // will match the outermost suite
+            def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+            def startItem = '|  ', endItem = '  |'
+            def repeatLength = startItem.length() + output.length() + endItem.length()
+            println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+        }
+    }
+}
+
+task javadocLink(type: Javadoc) {
+    source = sourceSets.main.allJava
+    classpath = sourceSets.main.runtimeClasspath
+    // link to math javadoc
+    if (isRelease) {
+        options {
+            links "https://javadoc.io/doc/org.cryptimeleon/math/" + mathVersionNoSuffix
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadocLink) {
+    from javadoc.destinationDir
+    archiveClassifier = 'javadoc'
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+java {
+    registerFeature("tests") {
+        usingSourceSet(sourceSets.test)
+    }
+    withJavadocJar()
+    withSourcesJar()
+}
