@@ -6,7 +6,7 @@ import org.cryptimeleon.math.structures.groups.mappings.impl.HashIntoGroupImpl;
 
 import java.util.Objects;
 
-public class EccelHashIntoG2Impl implements HashIntoGroupImpl {
+class EccelHashIntoG2Impl implements HashIntoGroupImpl {
     protected EccelGroup2Impl group;
 
     public EccelHashIntoG2Impl(EccelGroup2Impl group) {
