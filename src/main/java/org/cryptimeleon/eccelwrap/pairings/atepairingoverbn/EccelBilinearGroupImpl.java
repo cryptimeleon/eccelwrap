@@ -1,12 +1,10 @@
-package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
+package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import iaik.security.ec.math.curve.AtePairingOverBarretoNaehrigCurveFactory;
 import iaik.security.ec.math.curve.ECPoint;
 import iaik.security.ec.math.curve.Pairing;
 import iaik.security.ec.math.curve.PairingTypes;
 import iaik.security.ec.math.field.ExtensionFieldElement;
-import iaik.security.ec.provider.ECCelerate;
-import iaik.security.ec.provider.OptimizationLevel;
 import org.cryptimeleon.math.serialization.Representation;
 import org.cryptimeleon.math.serialization.annotations.ReprUtil;
 import org.cryptimeleon.math.serialization.annotations.Represented;
@@ -16,25 +14,33 @@ import org.cryptimeleon.math.structures.groups.elliptic.BilinearMapImpl;
 import org.cryptimeleon.math.structures.groups.mappings.impl.GroupHomomorphismImpl;
 import org.cryptimeleon.math.structures.groups.mappings.impl.HashIntoGroupImpl;
 
+import java.util.Arrays;
 import java.util.Objects;
 
-class ECCelerateBilinearGroupImpl implements BilinearGroupImpl {
+class EccelBilinearGroupImpl implements BilinearGroupImpl {
 
+    /**
+     * The security level guaranteed by this bilinear group.
+     */
     @Represented
-    private Integer securityParameter;
+    protected Integer securityParameter;
+    @Represented
+    protected PairingTypes pairingType;
+    @Represented
+    protected Integer groupBitSize;
     // (ordered ascending)
     protected final int[] securityLimits = {100, 128};
     // semantics: to achieve security securityLimits[i], you need a group of bit size minimumGroupBitSize[i]
     // predefined group sizes defined at http://javadoc.iaik.tugraz.at/ECCelerate/current/index.html
     protected final int[] minimumGroupBitSize = {256, 464};
-    @Represented
+
     protected Pairing pairing;
-    @Represented
-    protected ECCelerateGroup1Impl g1;
-    @Represented
-    protected ECCelerateGroup2Impl g2;
-    @Represented
-    protected ECCelerateTargetGroupImpl gT;
+
+    protected EccelGroup1Impl g1;
+    protected EccelGroup2Impl g2;
+    protected EccelTargetGroupImpl gT;
+
+    protected HashIntoGroupImpl hashIntoG1, hashIntoG2;
 
     /**
      * Tries to instantiate the bilinear group with the given security parameter and pairing type.
@@ -46,7 +52,7 @@ class ECCelerateBilinearGroupImpl implements BilinearGroupImpl {
      *
      * @throws IllegalArgumentException if the desired security parameter and/or pairing type cannot be fulfilled
      */
-    public ECCelerateBilinearGroupImpl(int securityParameter, BilinearGroup.Type pairingType) {
+    public EccelBilinearGroupImpl(int securityParameter, BilinearGroup.Type pairingType) {
         if (securityParameter > securityLimits[securityLimits.length -1]) {
             throw new IllegalArgumentException("Cannot accommodate a security parameter of " + securityParameter
                     + ", please choose one of at most " + securityLimits[securityLimits.length - 1]);
@@ -56,27 +62,41 @@ class ECCelerateBilinearGroupImpl implements BilinearGroupImpl {
                     + ", please choose either " + BilinearGroup.Type.TYPE_2 + " or " + BilinearGroup.Type.TYPE_3);
         }
         this.securityParameter = securityParameter;
-        int groupBitSize = 0;
+        groupBitSize = 0;
         for (int i = 0; i < securityLimits.length; i++) {
             if (securityParameter <= securityLimits[i]) {
                 groupBitSize = minimumGroupBitSize[i];
                 break;
             }
         }
+        this.pairingType = getECCeleratePairingType(pairingType);
+        init(this.pairingType, groupBitSize);
+    }
+
+    public EccelBilinearGroupImpl(Representation repr) {
+        new ReprUtil(this).deserialize(repr);
+        // This only works if the pairing is always the same based on these two parameters
+        // So the groupBitSize must correspond to a pre-defined parametrization
+        init(pairingType, groupBitSize);
+    }
+
+    protected void init(PairingTypes pairingType, int groupBitSize) {
         this.pairing = AtePairingOverBarretoNaehrigCurveFactory.getPairing(
-                getECCeleratePairingType(pairingType),
+                this.pairingType,
                 groupBitSize
         );
-        this.g1 = new ECCelerateGroup1Impl(pairing.getGroup1());
+        this.g1 = new EccelGroup1Impl(pairing.getGroup1());
         ECPoint generatorG2 = pairing.getGroup2().getGenerator().multiplyPoint(
                 pairing.getGroup2().getOrder().divide(pairing.getGroup1().getOrder())
         );
-        this.g2 = new ECCelerateGroup2Impl(pairing.getGroup2(), generatorG2 , pairing.getGroup1().getOrder());
+        this.hashIntoG1 = new EccelHashIntoG1Impl(g1);
+        this.g2 = new EccelGroup2Impl(pairing.getGroup2(), generatorG2 , pairing.getGroup1().getOrder());
         ExtensionFieldElement generatorGT = pairing.pair(
                 pairing.getGroup1().getGenerator(),
                 pairing.getGroup2().getGenerator()
         );
-        this.gT = new ECCelerateTargetGroupImpl(pairing.getTargetGroup(), generatorGT, pairing.getGroup1().getOrder());
+        this.hashIntoG2 = new EccelHashIntoG2Impl(g2);
+        this.gT = new EccelTargetGroupImpl(pairing.getTargetGroup(), generatorGT, pairing.getGroup1().getOrder());
     }
 
     /**
@@ -94,29 +114,29 @@ class ECCelerateBilinearGroupImpl implements BilinearGroupImpl {
     }
 
     @Override
-    public ECCelerateGroup1Impl getG1() {
+    public EccelGroup1Impl getG1() {
         return g1;
     }
 
     @Override
-    public ECCelerateGroup2Impl getG2() {
+    public EccelGroup2Impl getG2() {
         return g2;
     }
 
     @Override
-    public ECCelerateTargetGroupImpl getGT() {
+    public EccelTargetGroupImpl getGT() {
         return gT;
     }
 
     @Override
     public BilinearMapImpl getBilinearMap() {
-        return new ECCelerateBilinearMapImpl(this);
+        return new EccelBilinearMapImpl(this);
     }
 
     @Override
     public GroupHomomorphismImpl getHomomorphismG2toG1() throws UnsupportedOperationException {
         if (pairing.getType() == PairingTypes.TYPE_2) {
-            return new ECCelerateIsomorphism(pairing);
+            return new EccelIsomorphism(pairing);
         } else {
             throw new UnsupportedOperationException("Type 3 does not support a homomorphism from G2 to G1");
         }
@@ -124,17 +144,17 @@ class ECCelerateBilinearGroupImpl implements BilinearGroupImpl {
 
     @Override
     public HashIntoGroupImpl getHashIntoG1() throws UnsupportedOperationException {
-        return null;
+        return hashIntoG1;
     }
 
     @Override
     public HashIntoGroupImpl getHashIntoG2() throws UnsupportedOperationException {
-        return null;
+        return hashIntoG2;
     }
 
     @Override
     public HashIntoGroupImpl getHashIntoGT() throws UnsupportedOperationException {
-        return null;
+        throw new UnsupportedOperationException("Bilinear group does not support hashing to GT");
     }
 
     @Override
@@ -154,17 +174,25 @@ class ECCelerateBilinearGroupImpl implements BilinearGroupImpl {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ECCelerateBilinearGroupImpl that = (ECCelerateBilinearGroupImpl) o;
+        EccelBilinearGroupImpl that = (EccelBilinearGroupImpl) o;
         return Objects.equals(securityParameter, that.securityParameter) &&
+                pairingType == that.pairingType &&
+                Objects.equals(groupBitSize, that.groupBitSize) &&
+                Arrays.equals(securityLimits, that.securityLimits) &&
+                Arrays.equals(minimumGroupBitSize, that.minimumGroupBitSize) &&
                 Objects.equals(pairing, that.pairing) &&
                 Objects.equals(g1, that.g1) &&
                 Objects.equals(g2, that.g2) &&
-                Objects.equals(gT, that.gT);
+                Objects.equals(gT, that.gT) &&
+                Objects.equals(hashIntoG1, that.hashIntoG1);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(securityParameter, pairing, g1, g2, gT);
+        int result = Objects.hash(securityParameter, pairingType, groupBitSize, pairing, g1, g2, gT, hashIntoG1);
+        result = 31 * result + Arrays.hashCode(securityLimits);
+        result = 31 * result + Arrays.hashCode(minimumGroupBitSize);
+        return result;
     }
 
     @Override

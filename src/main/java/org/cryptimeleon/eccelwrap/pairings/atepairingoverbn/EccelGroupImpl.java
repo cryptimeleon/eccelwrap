@@ -1,13 +1,13 @@
-package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
+package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import org.cryptimeleon.math.serialization.Representation;
 import org.cryptimeleon.math.structures.groups.GroupImpl;
 
 import java.util.Optional;
 
-public abstract class ECCelerateGroupImpl implements GroupImpl {
+abstract class EccelGroupImpl implements GroupImpl {
 
-    public ECCelerateGroupImpl() {
+    public EccelGroupImpl() {
 
     }
 

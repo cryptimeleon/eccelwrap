@@ -1,43 +1,46 @@
-package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
+package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import iaik.security.ec.math.curve.ECPoint;
 import iaik.security.ec.math.curve.EllipticCurve;
 import org.cryptimeleon.math.serialization.Representation;
-import org.cryptimeleon.math.structures.groups.GroupElement;
 import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import org.cryptimeleon.math.structures.rings.zn.Zp;
 
 import java.math.BigInteger;
 
-class ECCelerateGroup1Impl extends ECCelerateGroupImpl {
-    protected EllipticCurve group;
+class EccelGroup2Impl extends EccelGroupImpl {
+    protected EllipticCurve curve;
+    protected ECPoint generator;
+    protected BigInteger primeP;
 
-    public ECCelerateGroup1Impl(EllipticCurve group) {
-        this.group = group;
+    public EccelGroup2Impl(EllipticCurve curve, ECPoint generator, BigInteger primeP) {
+        this.curve = curve;
+        this.generator = generator;
+        this.primeP = primeP;
     }
 
     @Override
     public GroupElementImpl getGenerator() throws UnsupportedOperationException {
-        return createElement(group.getGenerator());
+        return createElement(curve.getGenerator());
     }
 
-    protected ECCelerateGroup1ElementImpl createElement(ECPoint point) {
-        return new ECCelerateGroup1ElementImpl(this, point.clone());
+    protected EccelGroup2ElementImpl createElement(ECPoint point) {
+        return new EccelGroup2ElementImpl(this, point);
     }
 
     @Override
     public GroupElementImpl restoreElement(Representation repr) {
-        return new ECCelerateGroup1ElementImpl(this, repr);
+        return new EccelGroup2ElementImpl(this, repr);
     }
 
     @Override
     public GroupElementImpl getNeutralElement() {
-        return createElement(group.getNeutralPoint());
+        return createElement(curve.getNeutralPoint());
     }
 
     @Override
     public BigInteger size() throws UnsupportedOperationException {
-        return group.getOrder();
+        return primeP;
     }
 
     @Override
@@ -52,6 +55,6 @@ class ECCelerateGroup1Impl extends ECCelerateGroupImpl {
 
     @Override
     public GroupElementImpl getUniformlyRandomElement() throws UnsupportedOperationException {
-        return createElement(group.getGenerator()).pow(new Zp(size()).getUniformlyRandomUnit().asInteger());
+        return createElement(generator.clone()).pow(new Zp(primeP).getUniformlyRandomUnit().asInteger());
     }
 }

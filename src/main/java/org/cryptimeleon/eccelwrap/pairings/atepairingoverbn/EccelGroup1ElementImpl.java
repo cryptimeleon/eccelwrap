@@ -1,4 +1,4 @@
-package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
+package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import iaik.security.ec.errorhandling.DecodingException;
 import iaik.security.ec.math.curve.ECPoint;
@@ -10,36 +10,36 @@ import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import java.math.BigInteger;
 import java.util.Objects;
 
-class ECCelerateGroup2ElementImpl extends ECCelerateGroupElementImpl {
+class EccelGroup1ElementImpl extends EccelGroupElementImpl {
     protected ECPoint point;
 
-    public ECCelerateGroup2ElementImpl(ECCelerateGroup2Impl group, ECPoint point) {
+    public EccelGroup1ElementImpl(EccelGroup1Impl group, ECPoint point) {
         super(group);
         this.point = point;
     }
 
-    public ECCelerateGroup2ElementImpl(ECCelerateGroup2Impl group, Representation repr) {
+    public EccelGroup1ElementImpl(EccelGroup1Impl group, Representation repr) {
         super(group);
         try {
-            point = group.group.decodePoint(repr.bytes().get());
+            point = group.curve.decodePoint(repr.bytes().get());
         } catch (DecodingException e) {
             throw new IllegalArgumentException("Representation " + repr + " of given point is not on the curve " + group);
         }
     }
-    
+
     @Override
-    public ECCelerateGroup2Impl getStructure() {
-        return (ECCelerateGroup2Impl) super.getStructure();
+    public EccelGroup1Impl getStructure() {
+        return (EccelGroup1Impl) super.getStructure();
     }
 
     @Override
-    public ECCelerateGroup2ElementImpl inv() {
+    public EccelGroup1ElementImpl inv() {
         return getStructure().createElement(point.clone().negatePoint());
     }
 
     @Override
     public GroupElementImpl op(GroupElementImpl groupElement) throws IllegalArgumentException {
-        ECCelerateGroup2ElementImpl elementOp = (ECCelerateGroup2ElementImpl) groupElement;
+        EccelGroup1ElementImpl elementOp = (EccelGroup1ElementImpl) groupElement;
         if (elementOp.point.equals(point)) {
             return getStructure().createElement(point.clone().doublePoint());
         } else {
@@ -48,7 +48,7 @@ class ECCelerateGroup2ElementImpl extends ECCelerateGroupElementImpl {
     }
 
     @Override
-    public ECCelerateGroup2ElementImpl pow(BigInteger k) {
+    public EccelGroup1ElementImpl pow(BigInteger k) {
         if(k.signum() == -1) {
             k = k.mod(getStructure().size());
         }
@@ -70,7 +70,7 @@ class ECCelerateGroup2ElementImpl extends ECCelerateGroupElementImpl {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ECCelerateGroup2ElementImpl that = (ECCelerateGroup2ElementImpl) o;
+        EccelGroup1ElementImpl that = (EccelGroup1ElementImpl) o;
         return Objects.equals(point, that.point);
     }
 

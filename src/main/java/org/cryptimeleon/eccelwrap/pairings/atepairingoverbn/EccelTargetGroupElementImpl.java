@@ -1,4 +1,4 @@
-package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
+package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import iaik.security.ec.math.field.ExtensionFieldElement;
 import org.cryptimeleon.math.hash.ByteAccumulator;
@@ -9,22 +9,22 @@ import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import java.math.BigInteger;
 import java.util.Objects;
 
-class ECCelerateTargetGroupElementImpl extends ECCelerateGroupElementImpl {
+class EccelTargetGroupElementImpl extends EccelGroupElementImpl {
     protected ExtensionFieldElement element;
 
-    public ECCelerateTargetGroupElementImpl(ECCelerateTargetGroupImpl group, ExtensionFieldElement element) {
+    public EccelTargetGroupElementImpl(EccelTargetGroupImpl group, ExtensionFieldElement element) {
         super(group);
         this.element = element;
     }
 
-    public ECCelerateTargetGroupElementImpl(ECCelerateTargetGroupImpl group, Representation repr) {
+    public EccelTargetGroupElementImpl(EccelTargetGroupImpl group, Representation repr) {
         super(group);
-        this.element = group.targetGroup.newElement(repr.bytes().get());
+        this.element = group.targetField.newElement(repr.bytes().get());
     }
 
     @Override
-    public ECCelerateTargetGroupImpl getStructure() {
-        return (ECCelerateTargetGroupImpl) super.getStructure();
+    public EccelTargetGroupImpl getStructure() {
+        return (EccelTargetGroupImpl) super.getStructure();
     }
 
     @Override
@@ -34,7 +34,7 @@ class ECCelerateTargetGroupElementImpl extends ECCelerateGroupElementImpl {
 
     @Override
     public GroupElementImpl op(GroupElementImpl e) throws IllegalArgumentException {
-        ECCelerateTargetGroupElementImpl elementOp = (ECCelerateTargetGroupElementImpl) e;
+        EccelTargetGroupElementImpl elementOp = (EccelTargetGroupElementImpl) e;
         ExtensionFieldElement element1 = elementOp.element;
         return getStructure().createElement(this.element.clone().multiply(element1));
     }
@@ -62,7 +62,7 @@ class ECCelerateTargetGroupElementImpl extends ECCelerateGroupElementImpl {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ECCelerateTargetGroupElementImpl that = (ECCelerateTargetGroupElementImpl) o;
+        EccelTargetGroupElementImpl that = (EccelTargetGroupElementImpl) o;
         return Objects.equals(element, that.element);
     }
 

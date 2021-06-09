@@ -1,6 +1,6 @@
 package org.cryptimeleon.eccelwrap.pairings;
 
-import main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn.ECCelerateBilinearGroup;
+import org.cryptimeleon.eccelwrap.pairings.atepairingoverbn.EccelBilinearGroup;
 import org.cryptimeleon.math.pairings.PairingTests;
 import org.cryptimeleon.math.structures.groups.elliptic.BilinearGroup;
 import org.cryptimeleon.math.structures.groups.elliptic.BilinearMap;
@@ -19,8 +19,8 @@ public class PairingTest extends PairingTests {
     @Parameterized.Parameters(name = "Test: {0}")
     public static Collection<BilinearMap[]> data() {
         BilinearMap params[][] = new BilinearMap[][]{
-                {new ECCelerateBilinearGroup(100, BilinearGroup.Type.TYPE_3).getBilinearMap()},
-                {new ECCelerateBilinearGroup(100, BilinearGroup.Type.TYPE_2).getBilinearMap()}
+                {new EccelBilinearGroup(100, BilinearGroup.Type.TYPE_3).getBilinearMap()},
+                {new EccelBilinearGroup(100, BilinearGroup.Type.TYPE_2).getBilinearMap()}
         };
         return Arrays.asList(params);
     }

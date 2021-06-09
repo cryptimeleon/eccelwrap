@@ -1,37 +1,36 @@
-package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
+package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import iaik.security.ec.math.field.ExtensionField;
 import iaik.security.ec.math.field.ExtensionFieldElement;
 import org.cryptimeleon.math.serialization.Representation;
-import org.cryptimeleon.math.structures.groups.GroupElement;
 import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import org.cryptimeleon.math.structures.rings.zn.Zp;
 
 import java.math.BigInteger;
 
-class ECCelerateTargetGroupImpl extends ECCelerateGroupImpl {
-    protected ExtensionField targetGroup;
+class EccelTargetGroupImpl extends EccelGroupImpl {
+    protected ExtensionField targetField;
     protected ExtensionFieldElement generator;
     protected BigInteger primeP;
 
-    public ECCelerateTargetGroupImpl(ExtensionField targetGroup, ExtensionFieldElement generator, BigInteger primeP) {
-        this.targetGroup = targetGroup;
+    public EccelTargetGroupImpl(ExtensionField targetField, ExtensionFieldElement generator, BigInteger primeP) {
+        this.targetField = targetField;
         this.generator = generator;
         this.primeP = primeP;
     }
 
     @Override
     public GroupElementImpl restoreElement(Representation repr) {
-        return new ECCelerateTargetGroupElementImpl(this, repr);
+        return new EccelTargetGroupElementImpl(this, repr);
     }
 
-    public ECCelerateTargetGroupElementImpl createElement(ExtensionFieldElement element) {
-        return new ECCelerateTargetGroupElementImpl(this, element);
+    public EccelTargetGroupElementImpl createElement(ExtensionFieldElement element) {
+        return new EccelTargetGroupElementImpl(this, element);
     }
 
     @Override
     public GroupElementImpl getNeutralElement() {
-        return createElement(targetGroup.getOne());
+        return createElement(targetField.getOne());
     }
 
     @Override

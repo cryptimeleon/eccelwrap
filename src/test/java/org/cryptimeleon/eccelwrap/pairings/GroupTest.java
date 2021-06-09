@@ -1,16 +1,12 @@
 package org.cryptimeleon.eccelwrap.pairings;
 
-import iaik.security.ec.math.curve.ECPoint;
-import iaik.security.ec.math.curve.EllipticCurve;
-import iaik.security.ec.math.field.ExtensionFieldElement;
-import main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn.ECCelerateBilinearGroup;
+import org.cryptimeleon.eccelwrap.pairings.atepairingoverbn.EccelBilinearGroup;
 import org.cryptimeleon.math.structures.GroupTests;
 import org.cryptimeleon.math.structures.groups.elliptic.BilinearGroup;
 import org.cryptimeleon.math.structures.groups.elliptic.BilinearMap;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -25,7 +21,7 @@ public class GroupTest extends GroupTests {
     // add (name="Test: {0}") for jUnit 4.12+ to print group's name to test
     public static Collection<TestParams[]> data() {
         // Collect parameters
-        BilinearMap bilinearMap = new ECCelerateBilinearGroup(100, BilinearGroup.Type.TYPE_3)
+        BilinearMap bilinearMap = new EccelBilinearGroup(100, BilinearGroup.Type.TYPE_3)
                 .getBilinearMap();
 
         TestParams params[][] = new TestParams[][]{
