@@ -1,6 +1,6 @@
-package org.cryptimeleon.ecceleratewrap.pairings;
+package org.cryptimeleon.eccelwrap.pairings;
 
-import org.cryptimeleon.ecceleratewrap.pairings.atepairingoverbn.ECCelerateBilinearGroup;
+import main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn.ECCelerateBilinearGroup;
 import org.cryptimeleon.math.pairings.PairingTests;
 import org.cryptimeleon.math.structures.groups.elliptic.BilinearGroup;
 import org.cryptimeleon.math.structures.groups.elliptic.BilinearMap;

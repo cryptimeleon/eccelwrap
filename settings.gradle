@@ -3,7 +3,7 @@ plugins {
 }
 import org.ajoberstar.grgit.Grgit
 
-rootProject.name = 'ecceleratewrap'
+rootProject.name = 'eccelwrap'
 def msgPrefix = rootProject.name + " settings: "
 
 // do specific snapshot dependency resolution for snapshot builds

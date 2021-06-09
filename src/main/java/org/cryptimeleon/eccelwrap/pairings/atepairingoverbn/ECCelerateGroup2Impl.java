@@ -1,4 +1,4 @@
-package org.cryptimeleon.ecceleratewrap.pairings.atepairingoverbn;
+package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import iaik.security.ec.math.curve.ECPoint;
 import iaik.security.ec.math.curve.EllipticCurve;
@@ -9,11 +9,15 @@ import org.cryptimeleon.math.structures.rings.zn.Zp;
 
 import java.math.BigInteger;
 
-class ECCelerateGroup1Impl extends ECCelerateGroupImpl {
+class ECCelerateGroup2Impl extends ECCelerateGroupImpl {
     protected EllipticCurve group;
+    protected ECPoint generator;
+    protected BigInteger primeP;
 
-    public ECCelerateGroup1Impl(EllipticCurve group) {
+    public ECCelerateGroup2Impl(EllipticCurve group, ECPoint generator, BigInteger primeP) {
         this.group = group;
+        this.generator = generator;
+        this.primeP = primeP;
     }
 
     @Override
@@ -21,13 +25,13 @@ class ECCelerateGroup1Impl extends ECCelerateGroupImpl {
         return createElement(group.getGenerator());
     }
 
-    protected ECCelerateGroup1ElementImpl createElement(ECPoint point) {
-        return new ECCelerateGroup1ElementImpl(this, point.clone());
+    protected ECCelerateGroup2ElementImpl createElement(ECPoint point) {
+        return new ECCelerateGroup2ElementImpl(this, point);
     }
 
     @Override
     public GroupElementImpl restoreElement(Representation repr) {
-        return new ECCelerateGroup1ElementImpl(this, repr);
+        return new ECCelerateGroup2ElementImpl(this, repr);
     }
 
     @Override
@@ -37,7 +41,7 @@ class ECCelerateGroup1Impl extends ECCelerateGroupImpl {
 
     @Override
     public BigInteger size() throws UnsupportedOperationException {
-        return group.getOrder();
+        return primeP;
     }
 
     @Override
@@ -52,6 +56,6 @@ class ECCelerateGroup1Impl extends ECCelerateGroupImpl {
 
     @Override
     public GroupElementImpl getUniformlyRandomElement() throws UnsupportedOperationException {
-        return createElement(group.getGenerator()).pow(new Zp(size()).getUniformlyRandomUnit().asInteger());
+        return createElement(generator.clone()).pow(new Zp(primeP).getUniformlyRandomUnit().asInteger());
     }
 }

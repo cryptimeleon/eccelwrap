@@ -1,4 +1,4 @@
-package org.cryptimeleon.ecceleratewrap.pairings.atepairingoverbn;
+package main.java.org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
 import iaik.security.ec.math.field.ExtensionField;
 import iaik.security.ec.math.field.ExtensionFieldElement;
