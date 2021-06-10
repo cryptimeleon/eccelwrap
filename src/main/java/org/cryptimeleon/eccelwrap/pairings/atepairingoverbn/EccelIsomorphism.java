@@ -6,9 +6,10 @@ import org.cryptimeleon.math.serialization.annotations.Represented;
 import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import org.cryptimeleon.math.structures.groups.mappings.impl.GroupHomomorphismImpl;
 
+import java.util.Objects;
+
 class EccelIsomorphism implements GroupHomomorphismImpl {
 
-    @Represented
     Pairing pairing;
 
     public EccelIsomorphism(Pairing pairing) {
@@ -29,5 +30,18 @@ class EccelIsomorphism implements GroupHomomorphismImpl {
     @Override
     public Representation getRepresentation() {
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EccelIsomorphism that = (EccelIsomorphism) o;
+        return Objects.equals(pairing, that.pairing);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pairing);
     }
 }

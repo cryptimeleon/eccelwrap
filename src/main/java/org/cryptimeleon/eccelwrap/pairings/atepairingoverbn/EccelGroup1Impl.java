@@ -7,6 +7,7 @@ import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import org.cryptimeleon.math.structures.rings.zn.Zp;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 class EccelGroup1Impl extends EccelGroupImpl {
     protected EllipticCurve curve;
@@ -52,5 +53,18 @@ class EccelGroup1Impl extends EccelGroupImpl {
     @Override
     public GroupElementImpl getUniformlyRandomElement() throws UnsupportedOperationException {
         return createElement(curve.getGenerator()).pow(new Zp(size()).getUniformlyRandomUnit().asInteger());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EccelGroup1Impl that = (EccelGroup1Impl) o;
+        return Objects.equals(curve, that.curve);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(curve);
     }
 }

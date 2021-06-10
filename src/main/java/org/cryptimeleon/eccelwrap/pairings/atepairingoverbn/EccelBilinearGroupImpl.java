@@ -178,21 +178,17 @@ class EccelBilinearGroupImpl implements BilinearGroupImpl {
         return Objects.equals(securityParameter, that.securityParameter) &&
                 pairingType == that.pairingType &&
                 Objects.equals(groupBitSize, that.groupBitSize) &&
-                Arrays.equals(securityLimits, that.securityLimits) &&
-                Arrays.equals(minimumGroupBitSize, that.minimumGroupBitSize) &&
                 Objects.equals(pairing, that.pairing) &&
                 Objects.equals(g1, that.g1) &&
                 Objects.equals(g2, that.g2) &&
                 Objects.equals(gT, that.gT) &&
-                Objects.equals(hashIntoG1, that.hashIntoG1);
+                Objects.equals(hashIntoG1, that.hashIntoG1) &&
+                Objects.equals(hashIntoG2, that.hashIntoG2);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(securityParameter, pairingType, groupBitSize, pairing, g1, g2, gT, hashIntoG1);
-        result = 31 * result + Arrays.hashCode(securityLimits);
-        result = 31 * result + Arrays.hashCode(minimumGroupBitSize);
-        return result;
+        return Objects.hash(securityParameter, pairingType, groupBitSize, pairing, g1, g2, gT, hashIntoG1, hashIntoG2);
     }
 
     @Override

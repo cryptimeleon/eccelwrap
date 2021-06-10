@@ -20,7 +20,6 @@ class EccelHashIntoG2Impl implements HashIntoGroupImpl {
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EccelHashIntoG2Impl that = (EccelHashIntoG2Impl) o;

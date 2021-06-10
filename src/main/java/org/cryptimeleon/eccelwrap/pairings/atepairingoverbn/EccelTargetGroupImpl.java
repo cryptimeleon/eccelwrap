@@ -7,6 +7,7 @@ import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import org.cryptimeleon.math.structures.rings.zn.Zp;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 class EccelTargetGroupImpl extends EccelGroupImpl {
     protected ExtensionField targetField;
@@ -56,5 +57,20 @@ class EccelTargetGroupImpl extends EccelGroupImpl {
     @Override
     public GroupElementImpl getUniformlyRandomElement() throws UnsupportedOperationException {
         return createElement(generator.clone()).pow(new Zp(primeP).getUniformlyRandomUnit().asInteger());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EccelTargetGroupImpl that = (EccelTargetGroupImpl) o;
+        return Objects.equals(targetField, that.targetField) &&
+                Objects.equals(generator, that.generator) &&
+                Objects.equals(primeP, that.primeP);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(targetField, generator, primeP);
     }
 }
