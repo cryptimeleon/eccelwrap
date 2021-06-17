@@ -32,6 +32,9 @@ class EccelBilinearGroupImpl implements BilinearGroupImpl {
     protected final int[] securityLimits = {100, 128};
     // semantics: to achieve security securityLimits[i], you need a group of bit size minimumGroupBitSize[i]
     // predefined group sizes defined at http://javadoc.iaik.tugraz.at/ECCelerate/current/index.html
+    // numbers based on [BD19] Barbulescu, R., Duquesne, S. Updating Key Size Estimations for Pairings.
+    // !!! If you want to support a group bit size that is not predefined, you will have to rewrite the !!!
+    // !!! representation support and group class constructors as they all assume pre-definedness       !!!
     protected final int[] minimumGroupBitSize = {256, 464};
 
     protected Pairing pairing;
@@ -82,21 +85,14 @@ class EccelBilinearGroupImpl implements BilinearGroupImpl {
 
     protected void init(PairingTypes pairingType, int groupBitSize) {
         this.pairing = AtePairingOverBarretoNaehrigCurveFactory.getPairing(
-                this.pairingType,
+                pairingType,
                 groupBitSize
         );
-        this.g1 = new EccelGroup1Impl(pairing.getGroup1());
-        ECPoint generatorG2 = pairing.getGroup2().getGenerator().multiplyPoint(
-                pairing.getGroup2().getOrder().divide(pairing.getGroup1().getOrder())
-        );
-        this.hashIntoG1 = new EccelHashIntoG1Impl(g1);
-        this.g2 = new EccelGroup2Impl(pairing.getGroup2(), generatorG2 , pairing.getGroup1().getOrder());
-        ExtensionFieldElement generatorGT = pairing.pair(
-                pairing.getGroup1().getGenerator(),
-                pairing.getGroup2().getGenerator()
-        );
-        this.hashIntoG2 = new EccelHashIntoG2Impl(g2);
-        this.gT = new EccelTargetGroupImpl(pairing.getTargetGroup(), generatorGT, pairing.getGroup1().getOrder());
+        this.g1 = new EccelGroup1Impl(pairingType, groupBitSize);
+        this.hashIntoG1 = new EccelHashIntoG1Impl(pairingType, groupBitSize);
+        this.g2 = new EccelGroup2Impl(pairingType, groupBitSize);
+        this.hashIntoG2 = new EccelHashIntoG2Impl(pairingType, groupBitSize);
+        this.gT = new EccelTargetGroupImpl(pairingType, groupBitSize);
     }
 
     /**
@@ -136,7 +132,7 @@ class EccelBilinearGroupImpl implements BilinearGroupImpl {
     @Override
     public GroupHomomorphismImpl getHomomorphismG2toG1() throws UnsupportedOperationException {
         if (pairing.getType() == PairingTypes.TYPE_2) {
-            return new EccelIsomorphism(pairing);
+            return new EccelIsomorphism(pairingType, groupBitSize);
         } else {
             throw new UnsupportedOperationException("Type 3 does not support a homomorphism from G2 to G1");
         }
@@ -175,10 +171,10 @@ class EccelBilinearGroupImpl implements BilinearGroupImpl {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EccelBilinearGroupImpl that = (EccelBilinearGroupImpl) o;
+        // we do not check the pairing field here since it does not properly implement equals()
         return Objects.equals(securityParameter, that.securityParameter) &&
                 pairingType == that.pairingType &&
                 Objects.equals(groupBitSize, that.groupBitSize) &&
-                Objects.equals(pairing, that.pairing) &&
                 Objects.equals(g1, that.g1) &&
                 Objects.equals(g2, that.g2) &&
                 Objects.equals(gT, that.gT) &&
@@ -188,7 +184,7 @@ class EccelBilinearGroupImpl implements BilinearGroupImpl {
 
     @Override
     public int hashCode() {
-        return Objects.hash(securityParameter, pairingType, groupBitSize, pairing, g1, g2, gT, hashIntoG1, hashIntoG2);
+        return Objects.hash(securityParameter, pairingType, groupBitSize, g1, g2, gT, hashIntoG1, hashIntoG2);
     }
 
     @Override

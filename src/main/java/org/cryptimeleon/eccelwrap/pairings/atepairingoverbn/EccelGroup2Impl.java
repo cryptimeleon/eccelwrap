@@ -1,8 +1,9 @@
 package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
-import iaik.security.ec.math.curve.ECPoint;
-import iaik.security.ec.math.curve.EllipticCurve;
+import iaik.security.ec.math.curve.*;
+import org.cryptimeleon.math.random.RandomGenerator;
 import org.cryptimeleon.math.serialization.Representation;
+import org.cryptimeleon.math.serialization.annotations.ReprUtil;
 import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import org.cryptimeleon.math.structures.rings.zn.Zp;
 
@@ -11,13 +12,25 @@ import java.util.Objects;
 
 class EccelGroup2Impl extends EccelGroupImpl {
     protected EllipticCurve curve;
-    protected ECPoint generator;
-    protected BigInteger primeP;
+    protected BigInteger size;
 
-    public EccelGroup2Impl(EllipticCurve curve, ECPoint generator, BigInteger primeP) {
-        this.curve = curve;
-        this.generator = generator;
-        this.primeP = primeP;
+    public EccelGroup2Impl(PairingTypes pairingType, int groupBitSize) {
+        super(pairingType, groupBitSize);
+    }
+
+    public EccelGroup2Impl(Representation repr) {
+        super(repr);
+    }
+
+    @Override
+    void init(PairingTypes pairingType, int groupBitSize) {
+        Pairing pairing = AtePairingOverBarretoNaehrigCurveFactory.getPairing(
+                pairingType,
+                groupBitSize
+        );
+        this.curve = pairing.getGroup2();
+        // above curve's getOrder method gives the curve size, not the subgroup size. So use G1 size here
+        this.size = pairing.getGroup1().getOrder();
     }
 
     @Override
@@ -41,12 +54,7 @@ class EccelGroup2Impl extends EccelGroupImpl {
 
     @Override
     public BigInteger size() throws UnsupportedOperationException {
-        return primeP;
-    }
-
-    @Override
-    public boolean hasPrimeSize() {
-        return false;
+        return size;
     }
 
     @Override
@@ -56,7 +64,7 @@ class EccelGroup2Impl extends EccelGroupImpl {
 
     @Override
     public GroupElementImpl getUniformlyRandomElement() throws UnsupportedOperationException {
-        return createElement(generator.clone()).pow(new Zp(primeP).getUniformlyRandomUnit().asInteger());
+        return createElement(curve.getGenerator().clone()).pow(RandomGenerator.getRandomNumber(size()));
     }
 
     @Override
@@ -64,13 +72,11 @@ class EccelGroup2Impl extends EccelGroupImpl {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EccelGroup2Impl that = (EccelGroup2Impl) o;
-        return Objects.equals(curve, that.curve) &&
-                Objects.equals(generator, that.generator) &&
-                Objects.equals(primeP, that.primeP);
+        return Objects.equals(curve, that.curve);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(curve, generator, primeP);
+        return Objects.hash(curve);
     }
 }

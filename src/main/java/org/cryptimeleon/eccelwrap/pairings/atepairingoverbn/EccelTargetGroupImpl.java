@@ -1,5 +1,8 @@
 package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
+import iaik.security.ec.math.curve.AtePairingOverBarretoNaehrigCurveFactory;
+import iaik.security.ec.math.curve.Pairing;
+import iaik.security.ec.math.curve.PairingTypes;
 import iaik.security.ec.math.field.ExtensionField;
 import iaik.security.ec.math.field.ExtensionFieldElement;
 import org.cryptimeleon.math.serialization.Representation;
@@ -12,12 +15,29 @@ import java.util.Objects;
 class EccelTargetGroupImpl extends EccelGroupImpl {
     protected ExtensionField targetField;
     protected ExtensionFieldElement generator;
-    protected BigInteger primeP;
+    protected BigInteger size;
 
-    public EccelTargetGroupImpl(ExtensionField targetField, ExtensionFieldElement generator, BigInteger primeP) {
-        this.targetField = targetField;
-        this.generator = generator;
-        this.primeP = primeP;
+    public EccelTargetGroupImpl(PairingTypes pairingType, int groupBitSize) {
+        super(pairingType, groupBitSize);
+    }
+
+    public EccelTargetGroupImpl(Representation repr) {
+        super(repr);
+    }
+
+    @Override
+    void init(PairingTypes pairingType, int groupBitSize) {
+        Pairing pairing = AtePairingOverBarretoNaehrigCurveFactory.getPairing(
+                pairingType,
+                groupBitSize
+        );
+        targetField = pairing.getTargetGroup();
+        generator = pairing.pair(
+                pairing.getGroup1().getGenerator(),
+                pairing.getGroup2().getGenerator()
+        );
+        // all groups involved in pairing have same order
+        size = pairing.getGroup1().getOrder();
     }
 
     @Override
@@ -36,7 +56,7 @@ class EccelTargetGroupImpl extends EccelGroupImpl {
 
     @Override
     public BigInteger size() throws UnsupportedOperationException {
-        return primeP;
+        return size;
     }
 
     @Override
@@ -56,7 +76,7 @@ class EccelTargetGroupImpl extends EccelGroupImpl {
 
     @Override
     public GroupElementImpl getUniformlyRandomElement() throws UnsupportedOperationException {
-        return createElement(generator.clone()).pow(new Zp(primeP).getUniformlyRandomUnit().asInteger());
+        return createElement(generator.clone()).pow(new Zp(size).getUniformlyRandomUnit().asInteger());
     }
 
     @Override
@@ -66,11 +86,11 @@ class EccelTargetGroupImpl extends EccelGroupImpl {
         EccelTargetGroupImpl that = (EccelTargetGroupImpl) o;
         return Objects.equals(targetField, that.targetField) &&
                 Objects.equals(generator, that.generator) &&
-                Objects.equals(primeP, that.primeP);
+                Objects.equals(size, that.size);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(targetField, generator, primeP);
+        return Objects.hash(targetField, generator, size);
     }
 }

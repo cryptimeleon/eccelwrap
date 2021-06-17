@@ -1,8 +1,9 @@
 package org.cryptimeleon.eccelwrap.pairings.atepairingoverbn;
 
-import iaik.security.ec.math.curve.ECPoint;
-import iaik.security.ec.math.curve.EllipticCurve;
+import iaik.security.ec.math.curve.*;
+import org.cryptimeleon.math.random.RandomGenerator;
 import org.cryptimeleon.math.serialization.Representation;
+import org.cryptimeleon.math.serialization.annotations.ReprUtil;
 import org.cryptimeleon.math.structures.groups.GroupElementImpl;
 import org.cryptimeleon.math.structures.rings.zn.Zp;
 
@@ -12,8 +13,21 @@ import java.util.Objects;
 class EccelGroup1Impl extends EccelGroupImpl {
     protected EllipticCurve curve;
 
-    public EccelGroup1Impl(EllipticCurve curve) {
-        this.curve = curve;
+    public EccelGroup1Impl(PairingTypes pairingType, int groupBitSize) {
+        super(pairingType, groupBitSize);
+    }
+
+    public EccelGroup1Impl(Representation repr) {
+        super(repr);
+    }
+
+    @Override
+    void init(PairingTypes pairingType, int groupBitSize) {
+        Pairing pairing = AtePairingOverBarretoNaehrigCurveFactory.getPairing(
+                pairingType,
+                groupBitSize
+        );
+        this.curve = pairing.getGroup1();
     }
 
     @Override
@@ -41,18 +55,13 @@ class EccelGroup1Impl extends EccelGroupImpl {
     }
 
     @Override
-    public boolean hasPrimeSize() {
-        return false;
-    }
-
-    @Override
     public double estimateCostInvPerOp() {
         return 0;
     }
 
     @Override
     public GroupElementImpl getUniformlyRandomElement() throws UnsupportedOperationException {
-        return createElement(curve.getGenerator()).pow(new Zp(size()).getUniformlyRandomUnit().asInteger());
+        return createElement(curve.getGenerator()).pow(RandomGenerator.getRandomNumber(size()));
     }
 
     @Override
