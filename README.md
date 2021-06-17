@@ -13,7 +13,7 @@ For information on the right license for you, please consult their [license page
 
 To use Eccelwrap, you need to be in posession of a IAIK JCE license as well as the IAIK ECCelerate™ add-on.
 When you download them, you will receive a JAR file for each.
-To enable Eccelwrap to access them (they are not available in any existing repositories), you will need to install these to your local Maven repository via the following commands:
+To enable Eccelwrap to access the JARs (they are not available in any existing repositories), you will need to install them to your local Maven repository via the following commands:
 ```
 mvn install:install-file -Dfile=<JCE_file_name.jar> \
                          -DgroupId=iaik \
@@ -33,7 +33,7 @@ mvn install:install-file -Dfile=<ECCelerate_file_name.jar> \
 ```
 Insert the location of your JAR files for the `-Dfile` parameter.
 Eccelwrap is tested with JCE version 5.62 and ECCelerate™ version 6.02 and the above commands install them using the version strings that are required for Eccelwrap.
-You can still install other versions of the dependencies using the above commands, but the ´-Dversion` arguments need to be exactly as specified above.
+You can still install other versions of the dependencies using the above commands, but the `-Dversion` arguments need to be exactly as specified above.
 
 ## Miscellaneous Information
 

@@ -42,7 +42,7 @@ abstract class EccelGroupImpl implements GroupImpl {
 
     @Override
     public Optional<Integer> getUniqueByteLength() {
-        return Optional.empty();
+        return Optional.empty(); //TODO replace with actual value for better performance
     }
 
     @Override
